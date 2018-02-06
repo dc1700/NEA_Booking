@@ -10,8 +10,3 @@ Flask-Login==0.4.0
 Flask-WTF==0.14.2
 WTForms==2.1
 bcrypt==3.1.4
-cffi==1.11.2
-pip==9.0.1
-pycparser==2.18
-setuptools==28.8.0
-six==1.11.0

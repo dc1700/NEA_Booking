@@ -1,0 +1,10 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<form action="{{ url_for('book') }}">
+    <button class="button">New Booking</button>
+</form>
+<form action="{{ url_for('index') }}">
+    <button class="button">Delete Booking</button>
+</form>
+{% endblock %}

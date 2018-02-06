@@ -1,0 +1,12 @@
+{% macro render_field(field) %}
+    <div class="field">
+        <!--If any field has an error create a div for the field to host the error-->
+        {% if field.errors %}
+            {% for error in field.errors %}
+                <div class="notification error">{{ error }}</div>
+            {% endfor %}
+        {% endif %}
+        <!--Assign the field placeholders the labels set in forms.py-->
+        {{ field(placeholder = field.label.text) }}
+    </div>
+{% endmacro %}

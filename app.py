@@ -2,6 +2,7 @@
 from flask import Flask, g, render_template, flash, url_for, redirect
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_bcrypt import check_password_hash
+from datetime import datetime
 
 #Import models.py and forms.py
 import models
@@ -328,6 +329,15 @@ def book():
             else:
                 flash("Room fully booked!", 'error')
     return render_template('booking.html', form=form)
+
+
+@app.route('/delete_booking', methods = ('GET', 'POST'))
+@login_required
+def delete_booking():
+    bookings = models.Booking.select().where(models.Booking.date >= datetime.now().date(),
+                                             models.User == current_user)
+    return render_template('delete.html')
+
 
 
 @app.route('/')

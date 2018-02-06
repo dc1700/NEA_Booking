@@ -3,6 +3,7 @@ from flask_wtf import Form
 from wtforms import StringField, PasswordField, SelectField
 from wtforms.validators import Email, DataRequired, Regexp, Length, EqualTo, ValidationError
 from wtforms.fields.html5 import DateField
+from datetime import datetime, timedelta
 
 #Import User model
 from models import User
@@ -19,6 +20,23 @@ def name_exists(form, field):
 def email_exists(form, field):
     if User.select().where(User.email == field.data).exists():
         raise ValidationError('User with that email exists.')
+
+def date_in_future(form, field):
+    try:
+        val = field.data
+    except ValueError:
+        val = None
+    if val:
+        if val < datetime.now().date():
+            raise ValidationError('Selected date is in the past.')
+
+def date_is_weekday(form, field):
+    if (field.data).weekday() > 4:
+        raise ValidationError('Selected date is on a weekend.')
+
+def date_too_far(form, field):
+    if (field.data) > (datetime.now() + timedelta(days=31)).date():
+        raise ValidationError('Cannot book that far in advance.')
 
 #Creates a registration form with validated fields.
 class RegistrationForm(Form):
@@ -110,7 +128,7 @@ class BookingForm(Form):
     #Required field
     date = DateField(
         'Date',
-        validators=[DataRequired()],
+        validators=[DataRequired(), date_in_future, date_is_weekday, date_too_far],
         format= '%Y-%m-%d'
     )
     #Allows the user to select a period in which they will use the computer

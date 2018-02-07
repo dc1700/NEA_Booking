@@ -110,17 +110,17 @@ class BookingForm(Form):
     room = SelectField(
         'Room',
         choices=[
-            ('lib_ground', 'Library: Ground Floor'),
-            ('lib_first', 'Library: First Floor'),
-            ('social_first', 'Social Area: First Floor'),
-            ('f16', 'F16'),
-            ('f19', 'F19'),
-            ('f22', 'F22'),
-            ('f23', 'F23'),
-            ('f30', 'F30'),
-            ('f59', 'F59'),
-            ('f62', 'F62'),
-            ('f76', 'F76')
+            ('Library: Ground Floor', 'Library: Ground Floor'),
+            ('Library: First Floor', 'Library: First Floor'),
+            ('Social Area: First Floor', 'Social Area: First Floor'),
+            ('F16', 'F16'),
+            ('F19', 'F19'),
+            ('F22', 'F22'),
+            ('F23', 'F23'),
+            ('F30', 'F30'),
+            ('F59', 'F59'),
+            ('F62', 'F62'),
+            ('F76', 'F76')
             ],
         validators=[DataRequired()]
     )
@@ -136,11 +136,11 @@ class BookingForm(Form):
     period = SelectField(
         'Period',
         choices=[
-            ('p1', 'Period 1'),
-            ('p2', 'Period 2'),
-            ('p3', 'Period 3'),
-            ('p4', 'Period 4'),
-            ('p5', 'Period 5')
+            ('P1', 'Period 1'),
+            ('P2', 'Period 2'),
+            ('P3', 'Period 3'),
+            ('P4', 'Period 4'),
+            ('P5', 'Period 5')
         ],
         validators=[DataRequired()]
     )

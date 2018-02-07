@@ -123,6 +123,10 @@ article:last-child {
 article p {
   margin: 20px 0 0;
 }
+.delete {
+    color: #6EBD46;
+}
+
 time {
   font-size: .875em;
   opacity: .8;

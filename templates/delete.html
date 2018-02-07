@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+
+{% block content%}
+{% if no_of_bookings > 0 %}
+    {% for booking in bookings %}
+        <article>
+            <h2>{{ booking.purpose }}, {{ booking.room }}</h2>
+            <p>{{ booking.date }}, {{ booking.period }}</p>
+            <a href="#" class="delete">Delete Booking</a>
+        </article>
+    {% endfor %}
+{% else %}
+    <h1>You have no bookings to delete.</h1>
+{% endif %}
+{% endblock %}

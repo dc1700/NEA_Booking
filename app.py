@@ -3,6 +3,9 @@ from flask import Flask, g, render_template, flash, url_for, redirect
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_bcrypt import check_password_hash
 from datetime import datetime
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 #Import models.py and forms.py
 import models
@@ -114,6 +117,69 @@ def logout():
     #Return to the homepage
     return redirect(url_for('index'))
 
+def create(form):
+    models.Booking.create(user=g.user._get_current_object(),
+                          room=form.room.data,
+                          date=form.date.data,
+                          period=form.period.data,
+                          purpose=form.purpose.data)
+    flash("Booking Successful!", 'success')
+
+def send_email(form):
+    fromaddr = "test.ridgewood.clark@gmail.com"
+    toaddr = g.user.email
+    msg = MIMEMultipart()
+    msg['From'] = fromaddr
+    msg['To'] = toaddr
+    msg['Subject'] = "Booking Confirmation"
+    body = ""
+
+    if form.room.data == 'Library: Ground Floor':
+        body = "You have successfully booked a computer in the Library: Ground Floor, for {}, {}.".format(
+            form.period.data, form.date.data)
+    elif form.room.data == 'Library: First Floor':
+        body = "You have successfully booked a computer in the Library: First Floor, for {}, {}.".format(
+            form.period.data, form.date.data)
+    elif form.room.data == 'Social Area: First Floor':
+        body = "You have successfully booked a computer in the Social Area: First Floor, for {}, {}.".format(
+            form.period.data, form.date.data)
+    elif form.room.data == 'F16':
+        body = "You have successfully booked a computer in F16, for {}, {}.".format(
+            form.period.data, form.date.data)
+    elif form.room.data == 'F19':
+        body = "You have successfully booked a computer in F19, for {}, {}.".format(
+            form.period.data, form.date.data)
+    elif form.room.data == 'F20':
+        body = "You have successfully booked a computer in F20, for {}, {}.".format(
+            form.period.data, form.date.data)
+    elif form.room.data == 'F22':
+        body = "You have successfully booked a computer in F22, for {}, {}.".format(
+            form.period.data, form.date.data)
+    elif form.room.data == 'F23':
+        body = "You have successfully booked a computer in F23, for {}, {}.".format(
+            form.period.data, form.date.data)
+    elif form.room.data == 'F30':
+        body = "You have successfully booked a computer in F30, for {}, {}.".format(
+            form.period.data, form.date.data)
+    elif form.room.data == 'F59':
+        body = "You have successfully booked a computer in F59, for {}, {}.".format(
+            form.period.data, form.date.data)
+    elif form.room.data == 'F62':
+        body = "You have successfully booked a computer in F62, for {}, {}.".format(
+            form.period.data, form.date.data)
+    elif form.room.data == 'F76':
+        body = "You have successfully booked a computer in F76, for {}, {}.".format(
+            form.period.data, form.date.data)
+
+
+    msg.attach(MIMEText(body, 'plain'))
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login(fromaddr, 'Testing123')
+    text = msg.as_string()
+    server.sendmail(fromaddr, toaddr, text)
+    server.quit()
+
 #Routes to the new booking page
 @app.route('/new_booking', methods = ('GET', 'POST'))
 @login_required
@@ -122,16 +188,16 @@ def book():
     #Declare instances in query var
     instances_in_query = 0
     if form.validate_on_submit():
+        # If the room is the downstairs lib then perform a query that selects
+        # all of the bookings in the DB that have the same date, period and room as the input
+        query = models.Booking.select().where(
+            models.Booking.date == form.date.data,
+            models.Booking.period == form.period.data,
+            models.Booking.room == form.room.data
+        )
         #If the form validates then check to see which room was
         #selected so that number of computers can be checked
-        if form.room.data == 'lib_ground':
-            #If the room is the downstairs lib then perform a query that selects
-            #all of the bookings in the DB that have the same date, period and room as the input
-            query = models.Booking.select().where(
-                models.Booking.date == form.date.data,
-                models.Booking.period == form.period.data,
-                models.Booking.room == form.room.data
-            )
+        if form.room.data == 'Library: Ground Floor':
             #For each instance inside the query, add one to the instances var
             #so I know how many bookings have been made for the particular date and time
             for instance in query:
@@ -139,192 +205,98 @@ def book():
             #If instances are less than the number of computers, there are more
             #computers left and therefore booking can be created
             if instances_in_query < 6:
-                models.Booking.create(user=g.user._get_current_object(),
-                                      room=form.room.data,
-                                      date=form.date.data,
-                                      period=form.period.data,
-                                      purpose=form.purpose.data)
-                flash("Booking Created!", 'success')
+                create(form)
+                send_email(form)
                 return redirect(url_for('index'))
             else:
                 flash("Room fully booked!", 'error')
-        elif form.room.data == 'lib_first':
-            query = models.Booking.select().where(
-                models.Booking.date == form.date.data,
-                models.Booking.period == form.period.data,
-                models.Booking.room == form.room.data
-            )
+        elif form.room.data == 'Library: First Floor':
             for instance in query:
                 instances_in_query = instances_in_query + 1
             if instances_in_query < 3:
-                models.Booking.create(user=g.user._get_current_object(),
-                                      room=form.room.data,
-                                      date=form.date.data,
-                                      period=form.period.data,
-                                      purpose=form.purpose.data)
-                flash("Booking Created!", 'success')
+                create(form)
+                send_email(form)
                 return redirect(url_for('index'))
             else:
                 flash("Room fully booked!", 'error')
-        elif form.room.data == 'social_first':
-            query = models.Booking.select().where(
-                models.Booking.date == form.date.data,
-                models.Booking.period == form.period.data,
-                models.Booking.room == form.room.data
-            )
+        elif form.room.data == 'Social Area: First Floor':
             for instance in query:
                 instances_in_query = instances_in_query + 1
             if instances_in_query < 12:
-                models.Booking.create(user=g.user._get_current_object(),
-                                      room=form.room.data,
-                                      date=form.date.data,
-                                      period=form.period.data,
-                                      purpose=form.purpose.data)
-                flash("Booking Created!", 'success')
+                create(form)
+                send_email(form)
                 return redirect(url_for('index'))
             else:
                 flash("Room fully booked!", 'error')
-        elif form.room.data == 'f16':
-            query = models.Booking.select().where(
-                models.Booking.date == form.date.data,
-                models.Booking.period == form.period.data,
-                models.Booking.room == form.room.data
-            )
+        elif form.room.data == 'F16':
             for instance in query:
                 instances_in_query = instances_in_query + 1
             if instances_in_query < 9:
-                models.Booking.create(user=g.user._get_current_object(),
-                                      room=form.room.data,
-                                      date=form.date.data,
-                                      period=form.period.data,
-                                      purpose=form.purpose.data)
-                flash("Booking Created!", 'success')
+                create(form)
+                send_email(form)
                 return redirect(url_for('index'))
             else:
                 flash("Room fully booked!", 'error')
-        elif form.room.data == 'f19':
-            query = models.Booking.select().where(
-                models.Booking.date == form.date.data,
-                models.Booking.period == form.period.data,
-                models.Booking.room == form.room.data
-            )
+        elif form.room.data == 'F19':
             for instance in query:
                 instances_in_query = instances_in_query + 1
             if instances_in_query < 12:
-                models.Booking.create(user=g.user._get_current_object(),
-                                      room=form.room.data,
-                                      date=form.date.data,
-                                      period=form.period.data,
-                                      purpose=form.purpose.data)
-                flash("Booking Created!", 'success')
+                create(form)
+                send_email(form)
                 return redirect(url_for('index'))
             else:
                 flash("Room fully booked!", 'error')
-        elif form.room.data == 'f22':
-            query = models.Booking.select().where(
-                models.Booking.date == form.date.data,
-                models.Booking.period == form.period.data,
-                models.Booking.room == form.room.data
-            )
+        elif form.room.data == 'F22':
             for instance in query:
                 instances_in_query = instances_in_query + 1
             if instances_in_query < 12:
-                models.Booking.create(user=g.user._get_current_object(),
-                                      room=form.room.data,
-                                      date=form.date.data,
-                                      period=form.period.data,
-                                      purpose=form.purpose.data)
-                flash("Booking Created!", 'success')
+                create(form)
+                send_email(form)
                 return redirect(url_for('index'))
             else:
                 flash("Room fully booked!", 'error')
-        elif form.room.data == 'f23':
-            query = models.Booking.select().where(
-                models.Booking.date == form.date.data,
-                models.Booking.period == form.period.data,
-                models.Booking.room == form.room.data
-            )
+        elif form.room.data == 'F23':
             for instance in query:
                 instances_in_query = instances_in_query + 1
             if instances_in_query < 12:
-                models.Booking.create(user=g.user._get_current_object(),
-                                      room=form.room.data,
-                                      date=form.date.data,
-                                      period=form.period.data,
-                                      purpose=form.purpose.data)
-                flash("Booking Created!", 'success')
+                create(form)
+                send_email(form)
                 return redirect(url_for('index'))
             else:
                 flash("Room fully booked!", 'error')
-        elif form.room.data == 'f30':
-            query = models.Booking.select().where(
-                models.Booking.date == form.date.data,
-                models.Booking.period == form.period.data,
-                models.Booking.room == form.room.data
-            )
+        elif form.room.data == 'F30':
             for instance in query:
                 instances_in_query = instances_in_query + 1
             if instances_in_query < 8:
-                models.Booking.create(user=g.user._get_current_object(),
-                                      room=form.room.data,
-                                      date=form.date.data,
-                                      period=form.period.data,
-                                      purpose=form.purpose.data)
-                flash("Booking Created!", 'success')
+                create(form)
+                send_email(form)
                 return redirect(url_for('index'))
             else:
                 flash("Room fully booked!", 'error')
-        elif form.room.data == 'f59':
-            query = models.Booking.select().where(
-                models.Booking.date == form.date.data,
-                models.Booking.period == form.period.data,
-                models.Booking.room == form.room.data
-            )
+        elif form.room.data == 'F59':
             for instance in query:
                 instances_in_query = instances_in_query + 1
             if instances_in_query < 18:
-                models.Booking.create(user=g.user._get_current_object(),
-                                      room=form.room.data,
-                                      date=form.date.data,
-                                      period=form.period.data,
-                                      purpose=form.purpose.data)
-                flash("Booking Created!", 'success')
+                create(form)
+                send_email(form)
                 return redirect(url_for('index'))
             else:
                 flash("Room fully booked!", 'error')
-        elif form.room.data == 'f62':
-            query = models.Booking.select().where(
-                models.Booking.date == form.date.data,
-                models.Booking.period == form.period.data,
-                models.Booking.room == form.room.data
-            )
+        elif form.room.data == 'F62':
             for instance in query:
                 instances_in_query = instances_in_query + 1
             if instances_in_query < 16:
-                models.Booking.create(user=g.user._get_current_object(),
-                                      room=form.room.data,
-                                      date=form.date.data,
-                                      period=form.period.data,
-                                      purpose=form.purpose.data)
-                flash("Booking Created!", 'success')
+                create(form)
+                send_email(form)
                 return redirect(url_for('index'))
             else:
                 flash("Room fully booked!", 'error')
-        elif form.room.data == 'f76':
-            query = models.Booking.select().where(
-                models.Booking.date == form.date.data,
-                models.Booking.period == form.period.data,
-                models.Booking.room == form.room.data
-            )
+        elif form.room.data == 'F76':
             for instance in query:
                 instances_in_query = instances_in_query + 1
             if instances_in_query < 4:
-                models.Booking.create(user=g.user._get_current_object(),
-                                      room=form.room.data,
-                                      date=form.date.data,
-                                      period=form.period.data,
-                                      purpose=form.purpose.data)
-                flash("Booking Created!", 'success')
+                create(form)
+                send_email(form)
                 return redirect(url_for('index'))
             else:
                 flash("Room fully booked!", 'error')
@@ -334,9 +306,13 @@ def book():
 @app.route('/delete_booking', methods = ('GET', 'POST'))
 @login_required
 def delete_booking():
+    no_of_bookings = 0
     bookings = models.Booking.select().where(models.Booking.date >= datetime.now().date(),
-                                             models.User == current_user)
-    return render_template('delete.html')
+                                             models.Booking.user == g.user.get_id())
+    for booking in bookings:
+        no_of_bookings = no_of_bookings + 1
+
+    return render_template('delete.html', bookings = bookings, no_of_bookings = no_of_bookings)
 
 
 

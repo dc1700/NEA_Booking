@@ -303,9 +303,9 @@ def book():
     return render_template('booking.html', form=form)
 
 
-@app.route('/delete_booking', methods = ('GET', 'POST'))
+@app.route('/delete', methods = ('GET', 'POST'))
 @login_required
-def delete_booking():
+def delete():
     no_of_bookings = 0
     bookings = models.Booking.select().where(models.Booking.date >= datetime.now().date(),
                                              models.Booking.user == g.user.get_id())
@@ -314,6 +314,21 @@ def delete_booking():
 
     return render_template('delete.html', bookings = bookings, no_of_bookings = no_of_bookings)
 
+@app.route('/delete_booking/<room>/<date>/<period>/<purpose>')
+@login_required
+def delete_booking(room, date, period, purpose):
+        try:
+            models.Booking.get(user=g.user._get_current_object(),
+                                  room=room,
+                                  date=date,
+                                  period=period,
+                                  purpose=purpose).delete_instance()
+        except models.IntegrityError:
+            pass
+        else:
+            flash("Deleted booking for {} on {}.". format(purpose, date), 'success')
+            return redirect(url_for('delete'))
+        return delete()
 
 
 @app.route('/')

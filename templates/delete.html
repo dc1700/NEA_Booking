@@ -6,7 +6,7 @@
         <article>
             <h2>{{ booking.purpose }}, {{ booking.room }}</h2>
             <p>{{ booking.date }}, {{ booking.period }}</p>
-            <a href="#" class="delete">Delete Booking</a>
+            <a href="{{ url_for('delete_booking', room = booking.room, date = booking.date, period = booking.period, purpose = booking.purpose) }}" class="delete">Delete Booking</a>
         </article>
     {% endfor %}
 {% else %}

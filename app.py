@@ -328,7 +328,7 @@ def delete_booking(room, date, period, purpose):
         else:
             flash("Deleted booking for {} on {}.". format(purpose, date), 'success')
             return redirect(url_for('delete'))
-        return delete()
+        return redirect(url_for('delete'))
 
 
 @app.route('/')

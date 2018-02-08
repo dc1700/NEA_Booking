@@ -30,7 +30,11 @@
             <div class="grid-33">
 
                 <!-- Say Hi -->
-                <h1>Hello, {% if current_user.is_authenticated %} {{ current_user.username.split('.')[0].title()}}{% endif %}!</h1>
+                {% if current_user.is_authenticated %}
+                <h1>Hello, {{ current_user.username.split('.')[0].title() }}!</h1>
+                {% else %}
+                <h1>Hello there!</h1>
+                {% endif %}
 
             </div>
 

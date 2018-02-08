@@ -1,0 +1,9 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h1>404</h1>
+
+<p style="text-align:center">Sorry, the page you are looking for doesn't exist.</p>
+
+<p style="text-align:center"><a href="{{ url_for('index') }}" class="delete">Try Again</a></p>
+{% endblock %}

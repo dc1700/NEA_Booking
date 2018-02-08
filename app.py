@@ -1,5 +1,5 @@
 #Import frameworks
-from flask import Flask, g, render_template, flash, url_for, redirect
+from flask import Flask, g, render_template, flash, url_for, redirect, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_bcrypt import check_password_hash
 from datetime import datetime
@@ -118,12 +118,16 @@ def logout():
     return redirect(url_for('index'))
 
 def create(form):
-    models.Booking.create(user=g.user._get_current_object(),
-                          room=form.room.data,
-                          date=form.date.data,
-                          period=form.period.data,
-                          purpose=form.purpose.data)
-    flash("Booking Successful!", 'success')
+    try:
+        models.Booking.create(user=g.user._get_current_object(),
+                              room=form.room.data,
+                              date=form.date.data,
+                              period=form.period.data,
+                              purpose=form.purpose.data)
+    except:
+        abort(404)
+    else:
+        flash("Booking Successful!", 'success')
 
 def send_email(form):
     fromaddr = "test.ridgewood.clark@gmail.com"
@@ -324,7 +328,7 @@ def delete_booking(room, date, period, purpose):
                                   period=period,
                                   purpose=purpose).delete_instance()
         except models.IntegrityError:
-            pass
+            abort(404)
         else:
             flash("Deleted booking for {} on {}.". format(purpose, date), 'success')
             return redirect(url_for('delete'))
@@ -336,6 +340,10 @@ def delete_booking(room, date, period, purpose):
 def index():
     return render_template('home.html')
 
+
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('404.html'), 404
 
 
 #__name__ was applied to 'app' therefore it will equal __main__
